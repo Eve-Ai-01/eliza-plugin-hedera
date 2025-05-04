@@ -11,6 +11,11 @@ export class RejectTokenActionService {
     async execute(params: HederaHtsBalanceParams): Promise<RejectTokenResult> {
         const agentKit = this.hederaProvider.getHederaAgentKit();
 
-        return await agentKit.rejectToken(TokenId.fromString(params.tokenId));
+        const result = await agentKit.rejectToken(TokenId.fromString(params.tokenId));
+        if ('status' in result && 'txHash' in result) {
+            return result as RejectTokenResult;
+        } else {
+            throw new Error('Unexpected result from rejectToken: ' + JSON.stringify(result));
+        }
     }
 }

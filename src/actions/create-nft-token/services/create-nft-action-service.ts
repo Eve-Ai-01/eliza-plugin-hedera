@@ -27,8 +27,13 @@ export class CreateNftActionService  {
             memo: params.memo as string,
         }
 
-        return agentKit.createNFT(
+        const result = await agentKit.createNFT(
             options
         );
+        if ('status' in result && 'txHash' in result && 'tokenId' in result) {
+            return result as CreateTokenResult;
+        } else {
+            throw new Error('Unexpected result from createNFT: ' + JSON.stringify(result));
+        }
     }
 }

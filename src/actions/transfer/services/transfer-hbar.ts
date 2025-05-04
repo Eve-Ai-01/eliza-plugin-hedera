@@ -18,6 +18,11 @@ export class TransferHbarService {
         }
 
         const agentKit = this.hederaProvider.getHederaAgentKit();
-        return agentKit.transferHbar(accountId, amount);
+        const result = await agentKit.transferHbar(accountId, amount);
+        if ('status' in result && 'txHash' in result) {
+            return result as TransferHBARResult;
+        } else {
+            throw new Error('Unexpected result from transferHbar: ' + JSON.stringify(result));
+        }
     }
 }

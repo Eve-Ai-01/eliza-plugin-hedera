@@ -15,8 +15,13 @@ export class AssociateTokenActionService {
 
         const agentKit = this.hederaProvider.getHederaAgentKit();
 
-        return await agentKit.associateToken(
+        const result = await agentKit.associateToken(
             TokenId.fromString(params.tokenId)
         );
+        if ('status' in result && 'txHash' in result) {
+            return result as AssociateTokenResult;
+        } else {
+            throw new Error('Unexpected result from associateToken: ' + JSON.stringify(result));
+        }
     }
 }

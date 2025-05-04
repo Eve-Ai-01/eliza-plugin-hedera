@@ -3,6 +3,7 @@
         "target": "ESNext",
         "module": "ESNext",
         "lib": ["ESNext", "dom"],
+        "types": ["vitest/globals"],
         "moduleResolution": "Bundler",
         "outDir": "./dist",
         "rootDir": "./src",

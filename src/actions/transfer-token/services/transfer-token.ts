@@ -30,12 +30,17 @@ export class TransferTokenService {
 
         const tokenId = TokenId.fromString(params.tokenId);
 
-        return agentKit.transferToken(
+        const result = await agentKit.transferToken(
             tokenId,
             params.toAccountId,
             await toBaseUnit(params.tokenId, params.amount, networkType).then(
                 (a) => a.toNumber()
             )
         );
+        if ('status' in result && 'txHash' in result) {
+            return result as TransferTokenResult;
+        } else {
+            throw new Error('Unexpected result from transferToken: ' + JSON.stringify(result));
+        }
     }
 }

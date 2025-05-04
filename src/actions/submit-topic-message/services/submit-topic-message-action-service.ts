@@ -13,9 +13,14 @@ export class SubmitTopicMessageActionService {
     ): Promise<SubmitMessageResult> {
         const agentKit = this.hederaProvider.getHederaAgentKit();
 
-        return agentKit.submitTopicMessage(
+        const result = await agentKit.submitTopicMessage(
             TopicId.fromString(params.topicId),
             params.message
         );
+        if ('status' in result && 'txHash' in result && 'topicId' in result) {
+            return result as SubmitMessageResult;
+        } else {
+            throw new Error('Unexpected result from submitTopicMessage: ' + JSON.stringify(result));
+        }
     }
 }

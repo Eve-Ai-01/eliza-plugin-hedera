@@ -34,6 +34,11 @@ export class ClaimAirdropService {
 
         const agentKit = this.hederaProvider.getHederaAgentKit();
 
-        return agentKit.claimAirdrop(pendingAirdrop);
+        const result = await agentKit.claimAirdrop(pendingAirdrop);
+        if ('status' in result && 'txHash' in result) {
+            return result as ClaimAirdropResult;
+        } else {
+            throw new Error('Unexpected result from claimAirdrop: ' + JSON.stringify(result));
+        }
     }
 }

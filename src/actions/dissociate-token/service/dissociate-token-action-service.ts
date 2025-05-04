@@ -15,8 +15,13 @@ export class DissociateTokenActionService {
 
         const agentKit = this.hederaProvider.getHederaAgentKit();
 
-        return await agentKit.dissociateToken(
+        const result = await agentKit.dissociateToken(
             TokenId.fromString(params.tokenId)
         );
+        if ('status' in result && 'txHash' in result) {
+            return result as AssociateTokenResult;
+        } else {
+            throw new Error('Unexpected result from dissociateToken: ' + JSON.stringify(result));
+        }
     }
 }

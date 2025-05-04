@@ -22,9 +22,14 @@ export class MintTokenActionService {
             networkType
         );
 
-        return agentKit.mintToken(
+        const result = await agentKit.mintToken(
             TokenId.fromString(params.tokenId),
             baseUnitAmount.toNumber()
         );
+        if ('status' in result && 'txHash' in result) {
+            return result as MintTokenResult;
+        } else {
+            throw new Error('Unexpected result from mintToken: ' + JSON.stringify(result));
+        }
     }
 }

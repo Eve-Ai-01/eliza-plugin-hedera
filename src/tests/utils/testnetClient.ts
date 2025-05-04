@@ -17,7 +17,13 @@ import {
     HederaAgentKit,
     HederaNetworkType,
 } from "hedera-agent-kit";
-import { AirdropRecipient, SubmitMessageResult } from "hedera-agent-kit";
+import { SubmitMessageResult } from "hedera-agent-kit";
+
+// Define a local type for AirdropRecipient since it's not exported from hedera-agent-kit
+export interface AirdropRecipient {
+    accountId: string;
+    amount: number;
+}
 export class NetworkClientWrapper {
     private readonly accountId: AccountId;
     private readonly privateKey: PrivateKey;
@@ -83,7 +89,11 @@ export class NetworkClientWrapper {
 
     async createFT(options: CreateFTOptions): Promise<string> {
         const result = await this.agentKit.createFT(options);
-        return result.tokenId.toString();
+        if ('status' in result && 'txHash' in result && 'tokenId' in result) {
+            return result.tokenId.toString();
+        } else {
+            throw new Error('Unexpected result from createFT: ' + JSON.stringify(result));
+        }
     }
 
     async transferToken(
@@ -102,10 +112,15 @@ export class NetworkClientWrapper {
         tokenId: string,
         recipients: AirdropRecipient[]
     ): Promise<AirdropResult> {
-        return this.agentKit.airdropToken(
+        const result = await this.agentKit.airdropToken(
             TokenId.fromString(tokenId),
             recipients
         );
+        if ('status' in result && 'txHash' in result) {
+            return result as AirdropResult;
+        } else {
+            throw new Error('Unexpected result from airdropToken: ' + JSON.stringify(result));
+        }
     }
 
     getAccountId(): string {
@@ -116,14 +131,26 @@ export class NetworkClientWrapper {
         topicMemo: string,
         submitKey: boolean
     ): Promise<CreateTopicResult> {
-        return this.agentKit.createTopic(topicMemo, submitKey);
+        return this.agentKit.createTopic(topicMemo, submitKey).then(result => {
+            if ('status' in result && 'txHash' in result && 'topicId' in result) {
+                return result as CreateTopicResult;
+            } else {
+                throw new Error('Unexpected result from createTopic: ' + JSON.stringify(result));
+            }
+        });
     }
 
     submitTopicMessage(topicId: string, message: string): Promise<SubmitMessageResult> {
         return this.agentKit.submitTopicMessage(
             TopicId.fromString(topicId),
             message
-        );
+        ).then(result => {
+            if ('status' in result && 'txHash' in result && 'topicId' in result) {
+                return result as SubmitMessageResult;
+            } else {
+                throw new Error('Unexpected result from submitTopicMessage: ' + JSON.stringify(result));
+            }
+        });
     }
 
     associateToken(tokenId: string) {
@@ -132,6 +159,10 @@ export class NetworkClientWrapper {
 
     async createNFT(options: CreateNFTOptions): Promise<string> {
         const result = await this.agentKit.createNFT(options);
-        return result.tokenId.toString();
+        if ('status' in result && 'txHash' in result && 'tokenId' in result) {
+            return result.tokenId.toString();
+        } else {
+            throw new Error('Unexpected result from createNFT: ' + JSON.stringify(result));
+        }
     }
 }

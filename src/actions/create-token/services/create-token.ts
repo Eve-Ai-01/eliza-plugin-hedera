@@ -45,6 +45,11 @@ export class CreateTokenService {
             memo: params.memo as string,
         };
 
-        return agentKit.createFT(options);
+        const result = await agentKit.createFT(options);
+        if ('status' in result && 'txHash' in result && 'tokenId' in result) {
+            return result as CreateTokenResult;
+        } else {
+            throw new Error('Unexpected result from createFT: ' + JSON.stringify(result));
+        }
     }
 }

@@ -15,6 +15,11 @@ export class CreateTopicService {
 
         const agentKit = this.hederaProvider.getHederaAgentKit();
 
-        return agentKit.createTopic(params.memo, params.isSubmitKey);
+        const result = await agentKit.createTopic(params.memo, params.isSubmitKey);
+        if ('status' in result && 'txHash' in result && 'topicId' in result) {
+            return result as CreateTopicResult;
+        } else {
+            throw new Error('Unexpected result from createTopic: ' + JSON.stringify(result));
+        }
     }
 }

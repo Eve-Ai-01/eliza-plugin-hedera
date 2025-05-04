@@ -39,6 +39,11 @@ export class AirdropTokenService {
         );
 
         const agentKit = this.hederaProvider.getHederaAgentKit();
-        return await agentKit.airdropToken(tokenId, recipients);
+        const result = await agentKit.airdropToken(tokenId, recipients);
+        if ('status' in result && 'txHash' in result) {
+            return result as AirdropResult;
+        } else {
+            throw new Error('Unexpected result from airdropToken: ' + JSON.stringify(result));
+        }
     }
 }

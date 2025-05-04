@@ -25,10 +25,15 @@ export class SetSpendingApprovalTokenAction {
 
         const parsedTokenId = params.tokenId ? TokenId.fromString(params.tokenId) : undefined;
 
-        return await agentKit.approveAssetAllowance(
+        const result = await agentKit.approveAssetAllowance(
             AccountId.fromString(params.spenderAccountId),
             parsedAmount,
             parsedTokenId,
         );
+        if ('status' in result && 'txHash' in result) {
+            return result as AssetAllowanceResult;
+        } else {
+            throw new Error('Unexpected result from approveAssetAllowance: ' + JSON.stringify(result));
+        }
     }
 }

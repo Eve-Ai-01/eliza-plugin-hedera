@@ -14,6 +14,11 @@ export class DeleteTopicService {
         const agentKit = this.hederaProvider.getHederaAgentKit();
         const topicId = TopicId.fromString(params.topicId);
 
-        return agentKit.deleteTopic(topicId);
+        const result = await agentKit.deleteTopic(topicId);
+        if ('status' in result && 'txHash' in result) {
+            return result as DeleteTopicResult;
+        } else {
+            throw new Error('Unexpected result from deleteTopic: ' + JSON.stringify(result));
+        }
     }
 }
